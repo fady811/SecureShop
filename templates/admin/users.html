@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Manage users{% endblock %}
+{% block content %}
+<h1>Users</h1>
+{% include "admin/_nav.html" %}
+<form class="row-form" method="get" action="{{ url_for('admin.manage_users') }}">
+  <input name="q" value="{{ q }}" maxlength="100" placeholder="Search username or email" aria-label="Search">
+  <button type="submit" class="button">Search</button>
+</form>
+{# SECURITY (XSS): names and emails are autoescaped - a user called <script> is shown as text. #}
+<div class="table-wrap">
+  <table>
+    <tr><th>User</th><th>Role</th><th>Status</th><th>Credit</th><th>Actions</th></tr>
+    {% for u in users %}
+      <tr>
+        <td><strong>{{ u.username }}</strong><br><small>{{ u.email }}</small>
+            {% if u.full_name %}<br><small>{{ u.full_name }}</small>{% endif %}</td>
+        <td>{{ u.role }}</td>
+        <td>{% if u.is_disabled %}disabled{% elif not u.is_confirmed %}not confirmed{% elif u.locked_until > now %}locked{% else %}active{% endif %}</td>
+        <td>{{ u.store_credit_cents|money }}</td>
+        <td>
+          {% if u.id == g.user.id %}
+            <small class="muted">(you)</small>
+          {% else %}
+            <form class="row-form" method="post" action="{{ url_for('admin.toggle_user_disabled', user_id=u.id) }}">
+              <button type="submit" class="link-button dark">{% if u.is_disabled %}Enable{% else %}Disable{% endif %}</button>
+            </form>
+            <form class="row-form" method="post" action="{{ url_for('admin.change_role', user_id=u.id) }}">
+              <input type="hidden" name="role" value="{% if u.role == 'admin' %}user{% else %}admin{% endif %}">
+              <button type="submit" class="link-button dark">{% if u.role == 'admin' %}Make normal user{% else %}Make admin{% endif %}</button>
+            </form>
+          {% endif %}
+          {% if u.id != g.user.id %}
+          <form class="row-form" method="post" action="{{ url_for('admin.adjust_credit', user_id=u.id) }}">
+            <input name="amount" placeholder="+10 or -5" size="8" required aria-label="Amount">
+            <input name="reason" placeholder="Reason" maxlength="200" required aria-label="Reason">
+            <button type="submit" class="link-button dark">Adjust credit</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+    {% else %}
+      <tr><td colspan="5">No users found.</td></tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

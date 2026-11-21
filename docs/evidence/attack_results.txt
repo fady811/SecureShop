@@ -1,0 +1,23 @@
+Attack results - 2026-11-21 18:58
+Naive app:  http://127.0.0.1:5001   (VULNERABLE on purpose)
+SecureShop: http://127.0.0.1:5050
+
+[SQL injection] naive: ATTACK WORKED (leaked 3 usernames + MD5 hashes, e.g. admin:978295e0d1d3...)   |   SecureShop: ATTACK BLOCKED (searched for the text itself: 0 found, no hashes)
+[XSS (search text)] naive: ATTACK WORKED (<script> tag is in the page and would run)   |   SecureShop: ATTACK BLOCKED (shown as &lt;script&gt; text, does not run)
+[Error pages / stack trace] naive: ATTACK WORKED (HTTP 500 with stack trace: naive_demo/naive_app.py", line 229, in product)   |   SecureShop: ATTACK BLOCKED (friendly pages only (HTTP 404, 400, 200), no stack trace)
+[User enumeration] naive: ATTACK WORKED ('Unknown username.' vs 'Wrong password.' -> 'admin' exists)   |   SecureShop: ATTACK BLOCKED (same message both times: 'Invalid username or password.')
+[Password storage] naive: ATTACK WORKED (cracked shopper:sunshine123 from MD5 in 0.000s)   |   SecureShop: ATTACK BLOCKED (Argon2id+salt: 0/103 guesses matched; ~34 guesses/s vs ~2.2 million/s for MD5)
+[Weak password] naive: ATTACK WORKED (account created with 'password123')   |   SecureShop: ATTACK BLOCKED (refused: 'This password is too common')
+[Long email -> admin (Lab 2.2)] naive: ATTACK WORKED (268-char email cut to 255, account got role 'admin')   |   SecureShop: ATTACK BLOCKED (rejected 'Email must be at most 254 characters'; @secureshop.com gives role 'user')
+[Price tampering (Lab 1)] naive: ATTACK WORKED (paid $0.01 for the jacket)   |   SecureShop: ATTACK BLOCKED (price from database: $1,337.00, payment refused - not enough credit)
+[Coupon stacking (Lab 2.1)] naive: ATTACK WORKED (4 codes applied: -$34.50 (50% off))   |   SecureShop: ATTACK BLOCKED (one coupon only: SAVE20 = -$13.80 (20%))
+[Negative quantity] naive: ATTACK WORKED (credit went UP $99.99 -> $249.99)   |   SecureShop: ATTACK BLOCKED (rejected 'Quantity must be a whole number from 1 to 10.', credit stays $100.00)
+[Skip payment step (Lab 2.3)] naive: ATTACK WORKED (visiting /order/confirm created a PAID $1,337.00 order, $0 charged)   |   SecureShop: ATTACK BLOCKED (confirmation=404, GET pay=405, POST pay without token=302 -> no order created)
+[IDOR (other people's orders)] naive: ATTACK WORKED (shopper read victim's order /order/1)   |   SecureShop: ATTACK BLOCKED (victim's order N4jCuqFK... -> 404 / 404 for shopper)
+[Admin page via role cookie] naive: ATTACK WORKED (cookie role=admin opened the user list)   |   SecureShop: ATTACK BLOCKED (shopper + role=admin cookie -> 403; no login -> 302 to login)
+[2FA bypass (Lab 3)] naive: ATTACK WORKED (logged in as admin after 6123 code guesses)   |   SecureShop: ATTACK BLOCKED (50/50 code tries sent back to login (no pending login), /admin/ -> 403)
+[2FA code reuse] naive: ATTACK WORKED (the same sniffed code logged in twice)   |   SecureShop: ATTACK BLOCKED (first use OK, same code again -> 401 'Invalid code')
+[Reset link reuse / expiry] naive: ATTACK WORKED (the same reset link worked twice (never expires))   |   SecureShop: ATTACK BLOCKED (first use OK; reused -> 400; after 15 min -> 400)
+[Brute force login] naive: ATTACK WORKED (logged in as victim on guess 21, no lockout)   |   SecureShop: ATTACK BLOCKED (locked after 5 wrong tries - the correct 21st guess was refused too)
+
+Summary: 17 attacks - naive app: 17 worked; SecureShop: 17 blocked. (14s)

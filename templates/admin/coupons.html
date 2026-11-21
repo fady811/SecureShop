@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Manage coupons{% endblock %}
+{% block content %}
+<h1>Coupons</h1>
+{% include "admin/_nav.html" %}
+<p><a class="button" href="{{ url_for('admin.new_coupon') }}">Create coupon</a></p>
+<div class="table-wrap">
+  <table>
+    <tr><th>Code</th><th>Discount</th><th>Rules</th><th>Uses</th><th>Status</th><th>Actions</th></tr>
+    {% for c in coupons %}
+      <tr>
+        <td><strong>{{ c.code }}</strong>{% if c.owner_name %}<br><small>only for {{ c.owner_name }}</small>{% endif %}</td>
+        <td>{% if c.discount_type == 'percent' %}{{ c.discount_value }}%{% else %}{{ c.discount_value|money }}{% endif %}
+            {% if c.max_discount_cents %}<br><small>max {{ c.max_discount_cents|money }}</small>{% endif %}</td>
+        <td><small>{% if c.min_total_cents %}cart {{ c.min_total_cents|money }}+{% else %}any cart{% endif %}</small></td>
+        <td>{{ c.uses }}{% if c.max_uses %} / {{ c.max_uses }}{% endif %}</td>
+        <td>{% if not c.is_active %}inactive{% elif c.expires_at and c.expires_at < now %}expired{% else %}active{% endif %}</td>
+        <td>
+          <a href="{{ url_for('admin.edit_coupon', coupon_id=c.id) }}">Edit</a>
+          <form class="inline" method="post" action="{{ url_for('admin.toggle_coupon', coupon_id=c.id) }}">
+            <button type="submit" class="link-button dark">{% if c.is_active %}Deactivate{% else %}Activate{% endif %}</button>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

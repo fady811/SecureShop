@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Products{% endblock %}
+{% block content %}
+<h1>Products</h1>
+
+<form class="card filter-form" method="get" action="{{ url_for('catalog.product_list') }}">
+  <div class="filter-grid">
+    <div>
+      <label for="q">Search by name</label>
+      <input id="q" name="q" value="{{ q }}" maxlength="100">
+    </div>
+    <div>
+      <label for="category">Category</label>
+      <select id="category" name="category">
+        <option value="">All categories</option>
+        {% for c in categories %}
+          <option value="{{ c }}" {% if c == category %}selected{% endif %}>{{ c }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="min_price">Min price ($)</label>
+      <input id="min_price" name="min_price" value="{{ min_price }}" inputmode="decimal">
+    </div>
+    <div>
+      <label for="max_price">Max price ($)</label>
+      <input id="max_price" name="max_price" value="{{ max_price }}" inputmode="decimal">
+    </div>
+    <div>
+      <label for="sort">Sort by</label>
+      <select id="sort" name="sort">
+        {% for key, option in sort_options.items() %}
+          <option value="{{ key }}" {% if key == sort %}selected{% endif %}>{{ option[0] }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+  <p><button type="submit" class="button">Search</button>
+     <a href="{{ url_for('catalog.product_list') }}">Clear</a></p>
+</form>
+
+{% if errors %}
+  <div class="flash flash-error">
+    <ul class="error-list">{% for e in errors %}<li>{{ e }}</li>{% endfor %}</ul>
+  </div>
+{% else %}
+  {# SECURITY (XSS): {{ q }} is autoescaped by Jinja2. Never add |safe here. #}
+  {% if q %}<p>Results for "<strong>{{ q }}</strong>": {{ products|length }} found</p>{% endif %}
+
+  {% if products %}
+    <div class="grid">
+      {% for p in products %}
+        <div class="card">
+          <h3><a href="{{ url_for('catalog.product_detail', product_id=p.id) }}">{{ p.name }}</a></h3>
+          <p class="muted">{{ p.category }}</p>
+          <p class="price">{{ p.price_cents|money }}</p>
+          {% if p.stock == 0 %}<p class="muted">Out of stock</p>{% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>No products found.</p>
+  {% endif %}
+{% endif %}
+{% endblock %}

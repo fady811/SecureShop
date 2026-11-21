@@ -1,0 +1,17 @@
+# Local Python environment
+.venv/
+__pycache__/
+*.pyc
+
+# Local database and fake emails (re-created by seed.py / the app)
+secureshop.db
+outbox/
+
+# Secrets
+.env
+
+.DS_Store
+
+# Vulnerable demo app data (re-created by naive_demo/seed_naive.py)
+naive_demo/naive.db
+naive_demo/outbox/

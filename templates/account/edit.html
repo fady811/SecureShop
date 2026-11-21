@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Edit profile{% endblock %}
+{% block content %}
+<div class="card form-card">
+  <h1>Edit profile</h1>
+  {% if errors %}
+    <div class="flash flash-error"><ul class="error-list">{% for e in errors %}<li>{{ e }}</li>{% endfor %}</ul></div>
+  {% endif %}
+  {# Only these two fields can be changed. Username, email, role and credit cannot. #}
+  <form method="post" action="{{ url_for('account.edit_profile') }}">
+    <label for="full_name">Full name</label>
+    <input id="full_name" name="full_name" value="{{ full_name }}" maxlength="100">
+    <label for="shipping_address">Shipping address</label>
+    <textarea id="shipping_address" name="shipping_address" maxlength="200" rows="3">{{ shipping_address }}</textarea>
+    <p class="hint">Max 100 characters for the name and 200 for the address.</p>
+    <p><button type="submit" class="button">Save</button>
+       <a href="{{ url_for('account.profile') }}">Cancel</a></p>
+  </form>
+</div>
+{% endblock %}

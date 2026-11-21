@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}{% if product %}Edit product{% else %}Add product{% endif %}{% endblock %}
+{% block content %}
+<div class="card form-card">
+  <h1>{% if product %}Edit product{% else %}Add product{% endif %}</h1>
+  {% if errors %}
+    <div class="flash flash-error"><ul class="error-list">{% for e in errors %}<li>{{ e }}</li>{% endfor %}</ul></div>
+  {% endif %}
+  <form method="post">
+    <label for="name">Name</label>
+    <input id="name" name="name" value="{{ values.name }}" maxlength="100" required>
+    <label for="description">Description</label>
+    <textarea id="description" name="description" maxlength="2000" rows="4">{{ values.description }}</textarea>
+    <label for="category">Category</label>
+    <input id="category" name="category" value="{{ values.category }}" maxlength="50" required>
+    <label for="price">Price ($)</label>
+    <input id="price" name="price" value="{{ values.price }}" inputmode="decimal" required>
+    <label for="stock">Stock</label>
+    <input id="stock" name="stock" value="{{ values.stock }}" inputmode="numeric" required>
+    <p><button type="submit" class="button">Save</button>
+       <a href="{{ url_for('admin.manage_products') }}">Cancel</a></p>
+  </form>
+</div>
+{% endblock %}

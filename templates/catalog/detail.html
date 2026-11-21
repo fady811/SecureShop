@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}{{ product.name }}{% endblock %}
+{% block content %}
+<div class="card">
+  <p><a href="{{ url_for('catalog.product_list') }}">&larr; All products</a></p>
+  <h1>{{ product.name }}</h1>
+  <p class="muted">{{ product.category }}</p>
+  <p>{{ product.description }}</p>
+  <p class="price">{{ product.price_cents|money }}</p>
+
+  {% if product.stock > 0 %}
+    <p class="muted">{{ product.stock }} in stock</p>
+    {# SECURITY (Lab 1): the form sends ONLY product_id and quantity.
+       There is no price field - the server always reads the price from the database. #}
+    <form method="post" action="{{ url_for('cart.add_to_cart') }}">
+      <input type="hidden" name="product_id" value="{{ product.id }}">
+      <label for="quantity">Quantity (1-{{ max_quantity }})</label>
+      <input id="quantity" name="quantity" type="number" min="1" max="{{ max_quantity }}"
+             step="1" value="1" required class="qty-input">
+      <p><button type="submit" class="button">Add to cart</button></p>
+    </form>
+    {% if not g.user %}<p class="hint">You need to log in to use the cart.</p>{% endif %}
+  {% else %}
+    <p><strong>Out of stock</strong></p>
+  {% endif %}
+</div>
+{% endblock %}

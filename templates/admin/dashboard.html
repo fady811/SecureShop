@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Admin{% endblock %}
+{% block content %}
+<h1>Admin dashboard</h1>
+{% include "admin/_nav.html" %}
+<div class="grid">
+  <div class="card"><h3><a href="{{ url_for('admin.manage_users') }}">Users</a></h3><p class="price">{{ stats.users }}</p></div>
+  <div class="card"><h3><a href="{{ url_for('admin.manage_products') }}">Visible products</a></h3><p class="price">{{ stats.products }}</p></div>
+  <div class="card"><h3>Paid orders</h3><p class="price">{{ stats.orders }}</p></div>
+  <div class="card"><h3><a href="{{ url_for('admin.manage_coupons') }}">Active coupons</a></h3><p class="price">{{ stats.coupons }}</p></div>
+</div>
+<p class="hint">Every change you make here is written to the <a href="{{ url_for('admin.audit_log') }}">audit log</a>.</p>
+{% endblock %}

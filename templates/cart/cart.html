@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Your cart{% endblock %}
+{% block content %}
+<h1>Your cart</h1>
+
+{% if not lines %}
+  <div class="card">
+    <p>Your cart is empty.</p>
+    <p><a class="button" href="{{ url_for('catalog.product_list') }}">Browse products</a></p>
+  </div>
+{% else %}
+  {# SECURITY (Lab 1): every price and total on this page was calculated on the
+     server from the products table just now. The forms below send only
+     product_id and quantity - never a price. #}
+  <div class="table-wrap">
+    <table>
+      <tr><th>Product</th><th>Price</th><th>Quantity</th><th>Line total</th><th></th></tr>
+      {% for line in lines %}
+        <tr>
+          <td><a href="{{ url_for('catalog.product_detail', product_id=line.product_id) }}">{{ line.name }}</a></td>
+          <td>{{ line.unit_price_cents|money }}</td>
+          <td>
+            <form class="row-form" method="post" action="{{ url_for('cart.update_quantity') }}">
+              <input type="hidden" name="product_id" value="{{ line.product_id }}">
+              <input name="quantity" type="number" min="1" max="{{ line.max_quantity }}" step="1"
+                     value="{{ line.quantity }}" class="qty-input" aria-label="Quantity">
+              <button type="submit" class="link-button dark">Update</button>
+            </form>
+          </td>
+          <td>{{ line.line_total_cents|money }}</td>
+          <td>
+            <form class="inline" method="post" action="{{ url_for('cart.remove_from_cart') }}">
+              <input type="hidden" name="product_id" value="{{ line.product_id }}">
+              <button type="submit" class="link-button dark">Remove</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+      <tr><td colspan="3">Subtotal</td><td>{{ subtotal|money }}</td><td></td></tr>
+      {% if coupon_code %}
+        <tr><td colspan="3">Coupon <strong>{{ coupon_code }}</strong></td><td>-{{ discount|money }}</td>
+          <td>
+            <form class="inline" method="post" action="{{ url_for('coupons.remove_coupon') }}">
+              <button type="submit" class="link-button dark">Remove coupon</button>
+            </form>
+          </td></tr>
+      {% endif %}
+      <tr class="cart-total"><td colspan="3">Total</td><td>{{ total|money }}</td><td></td></tr>
+    </table>
+  </div>
+
+  <div class="card coupon-box">
+    <h2>Coupon code</h2>
+    <p class="hint">One coupon per order. A new code replaces the current one.</p>
+    <form class="row-form" method="post" action="{{ url_for('coupons.apply_coupon') }}">
+      <input name="code" maxlength="32" required aria-label="Coupon code" placeholder="e.g. WELCOME5">
+      <button type="submit" class="button">Apply</button>
+    </form>
+  </div>
+
+  <p><a class="button" href="{{ url_for('orders.checkout') }}">Go to checkout</a></p>
+{% endif %}
+{% endblock %}

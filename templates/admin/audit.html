@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Audit log{% endblock %}
+{% block content %}
+<h1>Audit log</h1>
+{% include "admin/_nav.html" %}
+<form class="row-form" method="get" action="{{ url_for('admin.audit_log') }}">
+  <select name="action" aria-label="Action">
+    <option value="">All actions</option>
+    {% for a in actions %}<option value="{{ a }}" {% if a == action %}selected{% endif %}>{{ a }}</option>{% endfor %}
+  </select>
+  <button type="submit" class="button">Filter</button>
+</form>
+<p class="hint">Latest 200 rows. Read only - nobody can edit or delete them here.</p>
+<div class="table-wrap">
+  <table>
+    <tr><th>Time (UTC)</th><th>User</th><th>Action</th><th>Details</th><th>IP</th></tr>
+    {% for r in rows %}
+      <tr><td><small>{{ r.created_at }}</small></td><td>{{ r.username or "-" }}</td>
+          <td>{{ r.action }}</td><td><small>{{ r.details }}</small></td><td><small>{{ r.ip_address }}</small></td></tr>
+    {% else %}
+      <tr><td colspan="5">No rows.</td></tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

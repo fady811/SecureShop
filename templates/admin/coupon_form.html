@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}{% if coupon %}Edit coupon{% else %}Create coupon{% endif %}{% endblock %}
+{% block content %}
+<div class="card form-card">
+  <h1>{% if coupon %}Edit coupon{% else %}Create coupon{% endif %}</h1>
+  {% if errors %}
+    <div class="flash flash-error"><ul class="error-list">{% for e in errors %}<li>{{ e }}</li>{% endfor %}</ul></div>
+  {% endif %}
+  <form method="post">
+    <label for="code">Code</label>
+    <input id="code" name="code" value="{{ form.code }}" maxlength="32" required>
+    <p class="hint">3-32 characters: letters, numbers, - and _. Saved in capitals.</p>
+    <label for="discount_type">Discount type</label>
+    <select id="discount_type" name="discount_type">
+      <option value="percent" {% if form.discount_type == 'percent' %}selected{% endif %}>Percent (1-30%)</option>
+      <option value="fixed" {% if form.discount_type == 'fixed' %}selected{% endif %}>Fixed amount ($)</option>
+    </select>
+    <label for="discount_value">Discount value</label>
+    <input id="discount_value" name="discount_value" value="{{ form.discount_value }}" required>
+    <label for="max_discount">Max discount ($, optional)</label>
+    <input id="max_discount" name="max_discount" value="{{ form.max_discount }}">
+    <label for="min_total">Minimum cart total ($, optional)</label>
+    <input id="min_total" name="min_total" value="{{ form.min_total }}">
+    <label for="max_uses">Max uses in total (optional)</label>
+    <input id="max_uses" name="max_uses" value="{{ form.max_uses }}" inputmode="numeric">
+    <label for="expires">Expires on (optional)</label>
+    <input id="expires" name="expires" type="date" value="{{ form.expires }}">
+    <p><button type="submit" class="button">Save</button>
+       <a href="{{ url_for('admin.manage_coupons') }}">Cancel</a></p>
+  </form>
+</div>
+{% endblock %}

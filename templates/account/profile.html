@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}My account{% endblock %}
+{% block content %}
+<div class="card form-card">
+  <h1>My account</h1>
+  {# SECURITY (IDOR): this is always YOUR account (from the session), there is no id in the URL. #}
+  <table>
+    <tr><th>Username</th><td>{{ user.username }}</td></tr>
+    <tr><th>Email</th><td>{{ user.email }}</td></tr>
+    <tr><th>Full name</th><td>{{ user.full_name or "-" }}</td></tr>
+    <tr><th>Shipping address</th><td>{{ user.shipping_address or "-" }}</td></tr>
+    <tr><th>Store credit</th><td><strong>{{ user.store_credit_cents|money }}</strong></td></tr>
+    <tr><th>Role</th><td>{{ user.role }}</td></tr>
+  </table>
+  <p>
+    <a class="button" href="{{ url_for('account.edit_profile') }}">Edit profile</a>
+    <a href="{{ url_for('account.change_password') }}">Change password</a> &middot;
+    <a href="{{ url_for('orders.order_history') }}">My orders</a> &middot;
+    <a href="{{ url_for('coupons.newsletter') }}">Newsletter</a>
+  </p>
+</div>
+{% endblock %}

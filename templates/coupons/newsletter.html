@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Newsletter{% endblock %}
+{% block content %}
+<div class="card form-card">
+  <h1>Newsletter</h1>
+  {% if subscribed %}
+    <p>You are subscribed to our newsletter. Thank you!</p>
+    <p class="muted">Your personal coupon was sent when you signed up (see the outbox/ folder).
+       Each account gets only one newsletter coupon.</p>
+  {% else %}
+    <p>Sign up and get a personal coupon: <strong>10% off</strong> (at most $10), one use.</p>
+    <p class="muted">We send it to your account email: {{ g.user.email }}</p>
+    {# No email field: the server always uses the email of your account. #}
+    <form method="post" action="{{ url_for('coupons.newsletter') }}">
+      <p><button type="submit" class="button">Sign me up</button></p>
+    </form>
+  {% endif %}
+</div>
+{% endblock %}

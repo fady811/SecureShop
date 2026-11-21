@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Checkout{% endblock %}
+{% block content %}
+<h1>Checkout</h1>
+{# SECURITY (Lab 1): everything on this page was calculated on the server from
+   the database. It is calculated AGAIN when you press Pay. #}
+<div class="table-wrap">
+  <table>
+    <tr><th>Product</th><th>Price</th><th>Quantity</th><th>Line total</th></tr>
+    {% for line in lines %}
+      <tr><td>{{ line.name }}</td><td>{{ line.unit_price_cents|money }}</td>
+          <td>{{ line.quantity }}</td><td>{{ line.line_total_cents|money }}</td></tr>
+    {% endfor %}
+    <tr><td colspan="3">Subtotal</td><td>{{ subtotal|money }}</td></tr>
+    {% if coupon_code %}
+      <tr><td colspan="3">Coupon <strong>{{ coupon_code }}</strong></td><td>-{{ discount|money }}</td></tr>
+    {% endif %}
+    <tr class="cart-total"><td colspan="3">Total to pay</td><td>{{ total|money }}</td></tr>
+  </table>
+</div>
+
+<div class="card coupon-box">
+  <p>Your store credit: <strong>{{ credit|money }}</strong></p>
+  {% if credit < total %}
+    <p class="flash flash-error">You do not have enough store credit for this order.</p>
+  {% endif %}
+  {# The form sends ONLY the one-time checkout token - no price or total. #}
+  <form method="post" action="{{ url_for('orders.pay') }}">
+    <input type="hidden" name="checkout_token" value="{{ checkout_token }}">
+    <button type="submit" class="button">Pay {{ total|money }} with store credit</button>
+  </form>
+  <p><a href="{{ url_for('cart.view_cart') }}">&larr; Back to cart (change items or coupon)</a></p>
+</div>
+{% endblock %}

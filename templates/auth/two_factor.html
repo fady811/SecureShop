@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Two-factor code{% endblock %}
+{% block content %}
+<div class="card form-card">
+  <h1>Enter your 6-digit code</h1>
+  <p class="muted">Open your authenticator app and type the current code.</p>
+  {% if error %}<div class="flash flash-error">{{ error }}</div>{% endif %}
+  {# SECURITY (Lab 3): there is deliberately NO hidden "user" field here.
+     The server knows who you are from the signed session only. #}
+  <form method="post" action="{{ url_for('auth.two_factor') }}">
+    <label for="code">Code</label>
+    <input id="code" name="code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required
+           autocomplete="one-time-code">
+    <p><button type="submit" class="button">Verify</button></p>
+  </form>
+</div>
+{% endblock %}

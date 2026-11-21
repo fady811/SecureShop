@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Manage products{% endblock %}
+{% block content %}
+<h1>Products</h1>
+{% include "admin/_nav.html" %}
+<p><a class="button" href="{{ url_for('admin.new_product') }}">Add product</a></p>
+<div class="table-wrap">
+  <table>
+    <tr><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Visible</th><th>Actions</th></tr>
+    {% for p in products %}
+      <tr>
+        <td>{{ p.name }}</td><td>{{ p.category }}</td><td>{{ p.price_cents|money }}</td>
+        <td>{{ p.stock }}</td><td>{% if p.is_active %}yes{% else %}hidden{% endif %}</td>
+        <td>
+          <a href="{{ url_for('admin.edit_product', product_id=p.id) }}">Edit</a>
+          <form class="inline" method="post" action="{{ url_for('admin.toggle_product', product_id=p.id) }}">
+            <button type="submit" class="link-button dark">{% if p.is_active %}Hide{% else %}Show{% endif %}</button>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+  </table>
+</div>
+<p class="hint">Products are never deleted (old orders link to them). Hide them instead.</p>
+{% endblock %}
